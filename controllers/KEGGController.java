@@ -3,12 +3,16 @@ package keggdbhelper.controllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.Callback;
 import keggdbhelper.models.Compound;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -43,23 +47,49 @@ public class KEGGController {
 
         ArrayList<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
         buildTable(compoundsToSearch);
-
-        for (Compound c : compoundsToSearch) {
-            System.out.println(c.getName());
-        }
     }
 
     private void buildTable(Collection<Compound> compounds) {
         table.setEditable(true);
         table.getColumns().clear();
-
         ObservableList<Compound> tableData = FXCollections.observableArrayList(compounds);
+
+        Callback<TableColumn, TableCell> cellFactory =
+                new Callback<TableColumn, TableCell>() {
+                    @Override
+                    public TableCell call(TableColumn param) {
+                        TableCell cell = new TableCell<Compound, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                setText(empty ? null : getString());
+                                setGraphic(null);
+                            }
+
+                            private String getString() {
+                                return getItem() == null ? "" : getItem().toString();
+                            }
+                        };
+
+                        cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+                            @Override
+                            public void handle(MouseEvent event) {
+                                System.out.println(event.getSource().toString() + " clicked.");
+                                // get results for compound
+                            }
+                        });
+                        return cell;
+                    }
+                };
 
         TableColumn compoundNameColumn = new TableColumn("Compound Name");
         compoundNameColumn.setCellValueFactory(new PropertyValueFactory<Compound, String>("name"));
+        compoundNameColumn.setCellFactory(cellFactory);
 
         table.setItems(tableData);
         table.getColumns().add(compoundNameColumn);
+
+        table.setEditable(false);
     }
 
     private ArrayList<Compound> extractCompoundsFromFile(File xmlFile) {
