@@ -127,6 +127,9 @@ public class KEGGController {
         StringBuilder ret = new StringBuilder();
         ret.append(split[0]);
         for (int i = 1; i < split.length - 1; ++i) {
+            if (split[i].contains("meto")) {
+                break;
+            }
             ret.append('-');
             ret.append(split[i]);
         }
