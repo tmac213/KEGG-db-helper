@@ -3,8 +3,8 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<GridPane fx:controller="keggdbhelper.KEGGController"
-          stylesheets="/keggdbhelper/MainViewStyle.css"
+<GridPane fx:controller="keggdbhelper.controllers.KEGGController"
+          stylesheets="/keggdbhelper/styles/MainViewStyle.css"
           xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
     <Button text="Choose an XML file" onAction="#chooseFile"/>
     <Label GridPane.rowIndex="1" fx:id="search"/>
