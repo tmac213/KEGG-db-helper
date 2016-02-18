@@ -1,7 +1,12 @@
 package keggdbhelper.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import keggdbhelper.models.Compound;
@@ -15,10 +20,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 public class KEGGController {
     public Label search;
+    public TableView<Compound> table;
     private String pathToXMLFile;
 
 
@@ -35,9 +42,24 @@ public class KEGGController {
         File chosenFile = fileChooser.showOpenDialog(mainWindow);
 
         ArrayList<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
+        buildTable(compoundsToSearch);
+
         for (Compound c : compoundsToSearch) {
-            System.out.println(c.name());
+            System.out.println(c.getName());
         }
+    }
+
+    private void buildTable(Collection<Compound> compounds) {
+        table.setEditable(true);
+        table.getColumns().clear();
+
+        ObservableList<Compound> tableData = FXCollections.observableArrayList(compounds);
+
+        TableColumn compoundNameColumn = new TableColumn("Compound Name");
+        compoundNameColumn.setCellValueFactory(new PropertyValueFactory<Compound, String>("name"));
+
+        table.setItems(tableData);
+        table.getColumns().add(compoundNameColumn);
     }
 
     private ArrayList<Compound> extractCompoundsFromFile(File xmlFile) {
