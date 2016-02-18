@@ -4,7 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -28,18 +27,12 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public class KEGGController {
-    public Label search;
     public TableView<Compound> table;
-    private String pathToXMLFile;
 
-
-    public void performSearch(ActionEvent actionEvent) {
-        search.setText(search.getText() + "!");
-    }
 
     public void chooseFile(ActionEvent actionEvent) {
 
-        Window mainWindow = search.getScene().getWindow();
+        Window mainWindow = table.getScene().getWindow();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select an XML File");
