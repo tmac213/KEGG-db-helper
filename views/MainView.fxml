@@ -9,22 +9,22 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 
-<GridPane alignment="CENTER" hgap="10" stylesheets="/keggdbhelper/styles/MainViewStyle.css" vgap="10" columnConstraints="" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="keggdbhelper.controllers.KEGGController">
-   <children>
-      <TableView fx:id="table" prefHeight="200.0" prefWidth="200.0">
-        <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
-        </columns>
-      </TableView>
-       <Button onAction="#chooseFile" text="Choose an XML file" GridPane.rowIndex="1" />
-   </children>
-   <columnConstraints>
-      <ColumnConstraints hgrow="ALWAYS"/>
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints vgrow="ALWAYS"/>
-      <RowConstraints vgrow="ALWAYS"/>
-      <RowConstraints vgrow="ALWAYS"/>
-   </rowConstraints>
+<GridPane alignment="CENTER" columnConstraints="" hgap="10" stylesheets="/keggdbhelper/styles/MainViewStyle.css" vgap="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="keggdbhelper.controllers.KEGGController">
+    <children>
+        <TableView fx:id="table" prefHeight="200.0" prefWidth="200.0">
+            <columns>
+            </columns>
+        </TableView>
+        <Button onAction="#chooseFile" text="Choose an XML file" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+         <GridPane.margin>
+            <Insets bottom="10.0" />
+         </GridPane.margin></Button>
+    </children>
+    <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints vgrow="ALWAYS" />
+      <RowConstraints />
+    </rowConstraints>
 </GridPane>
