@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import keggdbhelper.models.Compound;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -33,13 +34,13 @@ public class KEGGController {
         fileChooser.setTitle("Select an XML File");
         File chosenFile = fileChooser.showOpenDialog(mainWindow);
 
-        ArrayList<String> compoundsToSearch = extractCompoundsFromFile(chosenFile);
-        for (String s : compoundsToSearch) {
-            System.out.println(s);
+        ArrayList<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
+        for (Compound c : compoundsToSearch) {
+            System.out.println(c.name());
         }
     }
 
-    private ArrayList<String> extractCompoundsFromFile(File xmlFile) {
+    private ArrayList<Compound> extractCompoundsFromFile(File xmlFile) {
         if (xmlFile == null) {
             System.out.println("File was null");
             return null;
@@ -52,7 +53,7 @@ public class KEGGController {
             return null;
         }
 
-        ArrayList<String> ret = new ArrayList<String>();
+        ArrayList<Compound> ret = new ArrayList<Compound>();
 
         while (rowIterator.hasNext()) {
             Row currentRow = rowIterator.next();
@@ -75,7 +76,7 @@ public class KEGGController {
         return ret;
     }
 
-    private String extractCompoundFromCell(Cell cell) {
+    private Compound extractCompoundFromCell(Cell cell) {
         String[] split = cell.getStringCellValue().split("-");
         StringBuilder ret = new StringBuilder();
         ret.append(split[0]);
@@ -83,7 +84,7 @@ public class KEGGController {
             ret.append('-');
             ret.append(split[i]);
         }
-        return ret.toString();
+        return new Compound(ret.toString());
     }
 
     private Iterator<Row> getRowIteratorForFile(File xmlFile) {

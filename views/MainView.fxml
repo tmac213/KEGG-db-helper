@@ -1,11 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.GridPane?>
-
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<GridPane fx:controller="keggdbhelper.controllers.KEGGController"
-          stylesheets="/keggdbhelper/styles/MainViewStyle.css"
-          xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
-    <Button text="Choose an XML file" onAction="#chooseFile"/>
-    <Label GridPane.rowIndex="1" fx:id="search"/>
+
+<GridPane alignment="center" hgap="10" stylesheets="/keggdbhelper/styles/MainViewStyle.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="keggdbhelper.controllers.KEGGController">
+   <children>
+      <TableView prefHeight="200.0" prefWidth="200.0">
+        <columns>
+          <TableColumn prefWidth="75.0" text="C1" />
+          <TableColumn prefWidth="75.0" text="C2" />
+        </columns>
+      </TableView>
+       <Button onAction="#chooseFile" text="Choose an XML file" GridPane.rowIndex="1" />
+       <Label fx:id="search" GridPane.rowIndex="2" />
+   </children>
+   <columnConstraints>
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+   </rowConstraints>
 </GridPane>
