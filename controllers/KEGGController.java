@@ -76,6 +76,7 @@ public class KEGGController {
                 };
 
         TableColumn compoundNameColumn = new TableColumn("Compound Name");
+        compoundNameColumn.setPrefWidth(600);
         compoundNameColumn.setCellValueFactory(new PropertyValueFactory<Compound, String>("name"));
         compoundNameColumn.setCellFactory(cellFactory);
 
