@@ -10,7 +10,7 @@
 
 <GridPane alignment="center" hgap="10" stylesheets="/keggdbhelper/styles/MainViewStyle.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="keggdbhelper.controllers.KEGGController">
    <children>
-      <TableView prefHeight="200.0" prefWidth="200.0">
+      <TableView fx:id="table" prefHeight="200.0" prefWidth="200.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />
           <TableColumn prefWidth="75.0" text="C2" />
