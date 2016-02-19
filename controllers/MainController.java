@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import keggdbhelper.helpers.OutputGenerator;
 import keggdbhelper.models.Compound;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -60,6 +61,11 @@ public class MainController implements Initializable {
 
         ArrayList<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
         buildTable(compoundsToSearch);
+
+        new Thread(() -> {
+            OutputGenerator.generateOutput(compoundsToSearch);
+        }).start();
+        //OutputGenerator.generateOutput(compoundsToSearch);
     }
 
     private void buildTable(Collection<Compound> compounds) {
@@ -187,6 +193,4 @@ public class MainController implements Initializable {
             return null;
         }
     }
-
-
 }
