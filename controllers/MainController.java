@@ -4,12 +4,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Callback;
 import keggdbhelper.models.Compound;
@@ -22,13 +28,27 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 
-public class KEGGController {
+public class MainController implements Initializable {
     public TableView<Compound> table;
 
+    /**
+     * Called to initialize a controller after its root element has been
+     * completely processed.
+     *
+     * @param location  The location used to resolve relative paths for the root object, or
+     *                  <tt>null</tt> if the location is not known.
+     * @param resources The resources used to localize the root object, or <tt>null</tt> if
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+    }
 
     public void chooseFile(ActionEvent actionEvent) {
 
@@ -68,6 +88,24 @@ public class KEGGController {
                             @Override
                             public void handle(MouseEvent event) {
                                 System.out.println(event.getSource().toString() + " clicked.");
+                                Parent root;
+
+                                try {
+                                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/CompoundView.fxml"));
+                                    //root = loader.load(getClass().getResource("../views/CompoundView.fxml"));
+                                    Stage stage = new Stage(StageStyle.DECORATED);
+                                    stage.setTitle("Compound");
+                                    stage.setScene(new Scene(loader.load()));
+
+                                    CompoundController cc = loader.<CompoundController>getController();
+                                    cc.initData(((TableCell)event.getSource()).getText());
+
+                                    stage.show();
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
                                 // get results for compound
                             }
                         });
@@ -95,7 +133,7 @@ public class KEGGController {
         Iterator<Row> rowIterator = getRowIteratorForFile(xmlFile);
 
         if (rowIterator == null) {
-            System.err.println("KEGGController: getRowIteratorForFile returned null.");
+            System.err.println("MainController: getRowIteratorForFile returned null.");
             return null;
         }
 
@@ -149,4 +187,6 @@ public class KEGGController {
             return null;
         }
     }
+
+
 }
