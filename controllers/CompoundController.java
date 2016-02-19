@@ -2,8 +2,10 @@ package keggdbhelper.controllers;
 
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
+import keggdbhelper.helpers.OutputGenerator;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -30,16 +32,24 @@ public class CompoundController implements Initializable {
     }
 
     private void displayCompoundInfo(String compoundName) {
-        String resultIDs = searchByCompound();
+        List<String> resultIDs = searchByCompound(compoundName);
         String resultInfo = searchByIDs(resultIDs);
-        textArea.setText(String.format("%s info", compoundName));
+
+        StringBuilder sb = new StringBuilder();
+
+        for (String s : resultIDs) {
+            sb.append(s);
+            sb.append('\n');
+        }
+
+        textArea.setText(String.format(sb.toString()));
     }
 
-    private String searchByCompound() {
-        return "";
+    private List<String> searchByCompound(String name) {
+        return OutputGenerator.getIDs(name);
     }
 
-    private String searchByIDs(String ids) {
+    private String searchByIDs(List<String> ids) {
         return "";
     }
 }
