@@ -32,7 +32,7 @@ public class Compound {
     }
 
     public String outputString() {
-        return String.format("<h3>%s</h3>\n<br><ul>\n%s\n</ul><br>\n", this.name.get(), String.join("\n<br>", this.idLinks()));
+        return String.format("<h3>%s</h3>\n<ul>\n%s\n</ul><br>\n", this.name.get(), String.join("\n<br>", this.idLinks()));
     }
 
     private List<String> idLinks() {
