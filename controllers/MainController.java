@@ -29,10 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController implements Initializable {
     public TableView<Compound> table;
@@ -58,7 +55,7 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Select a .xls or .xlsx File");
         File chosenFile = fileChooser.showOpenDialog(mainWindow);
 
-        ArrayList<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
+        HashSet<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
         buildTable(compoundsToSearch);
 
         new Thread(() -> {
@@ -126,7 +123,7 @@ public class MainController implements Initializable {
         table.setEditable(false);
     }
 
-    private ArrayList<Compound> extractCompoundsFromFile(File xlsFile) {
+    private HashSet<Compound> extractCompoundsFromFile(File xlsFile) {
         if (xlsFile == null) {
             System.out.println("File was null");
             return null;
@@ -139,7 +136,7 @@ public class MainController implements Initializable {
             return null;
         }
 
-        ArrayList<Compound> ret = new ArrayList<Compound>();
+        HashSet<Compound> ret = new HashSet<>();
 
         while (rowIterator.hasNext()) {
             Row currentRow = rowIterator.next();
