@@ -10,7 +10,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by Emilio on 2/19/16.
@@ -24,6 +23,10 @@ public class OutputGenerator {
             System.err.println("retrieve IDs failed");
         }
 
+        /*if (!retrieveLinks(compounds)) {
+            System.err.println("retrieve links failed");
+        }*/
+
         if (!writeToOutput(compounds)) {
             System.err.println("write to output failed");
         }
@@ -33,15 +36,11 @@ public class OutputGenerator {
     public static boolean writeToOutput(Collection<Compound> compounds) {
         PrintWriter writer = null;
         try {
-            writer = new PrintWriter("output.txt", "UTF-8");
+            writer = new PrintWriter("output.html", "UTF-8");
             for (Compound currentCompound : compounds) {
                 System.out.println(String.format("writing to output for compound %s", currentCompound.getName()));
-                writer.println(currentCompound.getName());
-                for (String currentID : currentCompound.getids()) {
-                    writer.print(currentID);
-                    writer.print(';');
-                }
-                writer.println();
+                writer.print(currentCompound.outputString());
+                writer.println("<br>");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,29 +80,19 @@ public class OutputGenerator {
         return true;
     }
 
-    public static List<String> getIDs(String name) {
-        String currentLine = null;
-        ArrayList<String> results = new ArrayList<String>();
-        String urlString = String.format(FIND_TEMPLATE, name);
-        InputStream input = null;
-        try {
-            URL url = new URL(urlString);
-            URLConnection conn = url.openConnection();
-            input = conn.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-            if (input != null) {
-                while ((currentLine = reader.readLine()) != null) {
-                    results.add(currentLine.split("\t")[0].replace("cpd:", ""));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try { input.close(); } catch (Throwable ignore) {}
-        }
+    private static boolean retrieveLinks(Collection<Compound> compounds) {
 
-        return results;
+
+        return true;
     }
 
+    private static void generateHTML() {
 
+    }
+
+    private static void appendTag(StringBuilder sb, String tag, String contents) {
+        sb.append('<').append(tag).append('>');
+        sb.append(contents);
+        sb.append("</").append(tag).append('>');
+    }
 }
