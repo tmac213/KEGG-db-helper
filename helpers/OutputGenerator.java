@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Created by Emilio on 2/19/16.
@@ -53,11 +54,39 @@ public class OutputGenerator {
 
     public static boolean retrieveIDs(Collection<Compound> compounds) {
 
+        Collection<Thread> idRetrievalThreads = new LinkedList<>();
+
         for (Compound currentCompound : compounds) {
-            System.out.println(String.format("retrieving IDs for compound %s", currentCompound.getName()));
+            Thread currentThread = new IDRetrievalThread(currentCompound);
+            currentThread.start();
+            idRetrievalThreads.add(currentThread);
+        }
+
+        for (Thread thread : idRetrievalThreads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static class IDRetrievalThread extends Thread {
+        Compound compound;
+
+        IDRetrievalThread(Compound compound) {
+            this.compound = compound;
+        }
+
+        @Override
+        public void run() {
+            System.out.println(String.format("retrieving IDs for compound %s", compound.getName()));
             String currentLine;
             ArrayList<String> ids = new ArrayList<>();
-            String urlString = String.format(FIND_TEMPLATE, currentCompound.getName());
+            String urlString = String.format(FIND_TEMPLATE, compound.getName());
             InputStream input = null;
             try {
                 URL url = new URL(urlString);
@@ -71,13 +100,11 @@ public class OutputGenerator {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
             } finally {
                 try { input.close(); } catch (Throwable ignore) {}
             }
-            currentCompound.setIds(ids);
+            compound.setIds(ids);
         }
-        return true;
     }
 
     private static boolean retrieveLinks(Collection<Compound> compounds) {
