@@ -6,7 +6,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -56,7 +55,7 @@ public class MainController implements Initializable {
         Window mainWindow = table.getScene().getWindow();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select an XML File");
+        fileChooser.setTitle("Select a .xls or .xlsx File");
         File chosenFile = fileChooser.showOpenDialog(mainWindow);
 
         ArrayList<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
@@ -65,7 +64,6 @@ public class MainController implements Initializable {
         new Thread(() -> {
             OutputGenerator.generateOutput(compoundsToSearch);
         }).start();
-        //OutputGenerator.generateOutput(compoundsToSearch);
     }
 
     private void buildTable(Collection<Compound> compounds) {
@@ -94,11 +92,9 @@ public class MainController implements Initializable {
                             @Override
                             public void handle(MouseEvent event) {
                                 System.out.println(event.getSource().toString() + " clicked.");
-                                Parent root;
 
                                 try {
                                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/CompoundView.fxml"));
-                                    //root = loader.load(getClass().getResource("../views/CompoundView.fxml"));
                                     Stage stage = new Stage(StageStyle.DECORATED);
                                     stage.setTitle("Compound");
                                     stage.setScene(new Scene(loader.load()));
@@ -130,13 +126,13 @@ public class MainController implements Initializable {
         table.setEditable(false);
     }
 
-    private ArrayList<Compound> extractCompoundsFromFile(File xmlFile) {
-        if (xmlFile == null) {
+    private ArrayList<Compound> extractCompoundsFromFile(File xlsFile) {
+        if (xlsFile == null) {
             System.out.println("File was null");
             return null;
         }
 
-        Iterator<Row> rowIterator = getRowIteratorForFile(xmlFile);
+        Iterator<Row> rowIterator = getRowIteratorForFile(xlsFile);
 
         if (rowIterator == null) {
             System.err.println("MainController: getRowIteratorForFile returned null.");
@@ -180,9 +176,9 @@ public class MainController implements Initializable {
         return new Compound(ret.toString());
     }
 
-    private Iterator<Row> getRowIteratorForFile(File xmlFile) {
+    private Iterator<Row> getRowIteratorForFile(File xlsFile) {
         try {
-            FileInputStream inputStream = new FileInputStream(xmlFile);
+            FileInputStream inputStream = new FileInputStream(xlsFile);
             Workbook workbook = new XSSFWorkbook(inputStream);
             return workbook.getSheetAt(0).rowIterator();
         } catch (FileNotFoundException e) {
