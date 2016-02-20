@@ -127,15 +127,25 @@ public class OutputGenerator {
     private static String cssStyleString() {
         return "<head>\n" +
                 "<style>\n" +
-                "body {\n" +
-                "    background-color: #FCFBE3;\n" +
-                "}\n" +
+                "    h3 {\n" +
+                "    padding: 0 0 0 0;\n" +
+                "    margin: 0 0 0 0;\n" +
+                "    }\n" +
                 "\n" +
-                "li {\n" +
-                "    float: left;\n" +
-                "} \n" +
+                "    ul {\n" +
+                "    padding: 0 0 20 20;\n" +
+                "    margin: 0 0 0 0;\n" +
+                "    }\n" +
+                "\n" +
+                "    body {\n" +
+                "        background-color: #FCFBE3;\n" +
+                "    }\n" +
+                "\n" +
+                "    li {\n" +
+                "        float: left;\n" +
+                "    }\n" +
                 "</style>\n" +
-                "</head>";
+                "</head>\n";
     }
 
 }
