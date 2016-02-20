@@ -8,9 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Created by Emilio on 2/19/16.
@@ -38,10 +36,13 @@ public class OutputGenerator {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter("output.html", "UTF-8");
-            for (Compound currentCompound : compounds) {
+            List<Compound> compoundList = new ArrayList<>(compounds);
+            Collections.sort(compoundList, (o1, o2) -> (o1.getName().compareTo(o2.getName())));
+            writer.println(cssStyleString());
+
+            for (Compound currentCompound : compoundList) {
                 System.out.println(String.format("writing to output for compound %s", currentCompound.getName()));
                 writer.print(currentCompound.outputString());
-                writer.println("<br>");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -122,4 +123,19 @@ public class OutputGenerator {
         sb.append(contents);
         sb.append("</").append(tag).append('>');
     }
+
+    private static String cssStyleString() {
+        return "<head>\n" +
+                "<style>\n" +
+                "body {\n" +
+                "    background-color: #FCFBE3;\n" +
+                "}\n" +
+                "\n" +
+                "li {\n" +
+                "    float: left;\n" +
+                "} \n" +
+                "</style>\n" +
+                "</head>";
+    }
+
 }
