@@ -32,7 +32,7 @@ public class Compound {
     }
 
     public String outputString() {
-        return String.format("%s\n<br>%s", this.name.get(), String.join("\n<br>", this.idLinks()));
+        return String.format("<h3>%s</h3>\n<br><ul>\n%s</ul>", this.name.get(), String.join("\n<br>", this.idLinks()));
     }
 
     private List<String> idLinks() {
@@ -42,6 +42,6 @@ public class Compound {
     }
 
     private static String idLink(String id) {
-        return String.format("<a href=\"http://www.genome.jp/dbget-bin/www_bget?cpd:%s\">%s</a>", id, id);
+        return String.format("<li><a href=\"http://www.genome.jp/dbget-bin/www_bget?cpd:%s\">%s</a></li>", id, id);
     }
 }
