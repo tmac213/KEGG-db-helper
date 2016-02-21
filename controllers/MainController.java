@@ -59,7 +59,7 @@ public class MainController implements Initializable {
         buildTable(compoundsToSearch);
 
         new Thread(() -> {
-            OutputGenerator.generateOutput(compoundsToSearch);
+            OutputGenerator.generateOutput(compoundsToSearch, String.format("%s-output.html", chosenFile.getName()));
         }).start();
     }
 
