@@ -17,7 +17,7 @@ public class OutputGenerator {
 
     static final String FIND_TEMPLATE = "http://rest.kegg.jp/find/compound/%s";
 
-    public static boolean generateOutput(Collection<Compound> compounds) {
+    public static boolean generateOutput(Collection<Compound> compounds, String outputFilename) {
         if (!retrieveIDs(compounds)) {
             System.err.println("retrieve IDs failed");
         }
@@ -26,16 +26,16 @@ public class OutputGenerator {
             System.err.println("retrieve links failed");
         }*/
 
-        if (!writeToOutput(compounds)) {
+        if (!writeToOutput(compounds, outputFilename)) {
             System.err.println("write to output failed");
         }
         return true;
     }
 
-    public static boolean writeToOutput(Collection<Compound> compounds) {
+    public static boolean writeToOutput(Collection<Compound> compounds, String outputFilename) {
         PrintWriter writer = null;
         try {
-            writer = new PrintWriter("output.html", "UTF-8");
+            writer = new PrintWriter(outputFilename, "UTF-8");
             List<Compound> compoundList = new ArrayList<>(compounds);
             Collections.sort(compoundList, (o1, o2) -> (o1.getName().compareTo(o2.getName())));
             writer.println(cssStyleString());
