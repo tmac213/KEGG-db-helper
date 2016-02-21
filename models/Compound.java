@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
  * Created by Emilio on 2/17/16.
  */
 public class Compound {
+    private static String HEADER_TEMPLATE = "<h3>%s</h3>";
+    private static String LINK_LIST_TEMPLATE = "<ul>\n%s\n</ul>";
+
     private SimpleStringProperty name;
     private SimpleListProperty<String> ids;
 
@@ -32,7 +35,18 @@ public class Compound {
     }
 
     public String outputString() {
-        return String.format("<h3>%s</h3>\n<ul>\n%s\n</ul><br>\n", this.name.get(), String.join("\n<br>", this.idLinks()));
+        if (this.ids.isEmpty()) {
+            return String.format("%s\n<i>No results found.</i><br><br>\n", this.headerString());
+        }
+        return String.format("%s\n%s<br>\n", this.headerString(), this.linkListString());
+    }
+
+    private String headerString() {
+        return String.format(HEADER_TEMPLATE, this.name.get());
+    }
+
+    private String linkListString() {
+        return String.format(LINK_LIST_TEMPLATE ,String.join("\n<br>", this.idLinks()));
     }
 
     private List<String> idLinks() {
