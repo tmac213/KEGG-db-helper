@@ -96,6 +96,9 @@ public class OutputGenerator {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(input));
                 if (input != null) {
                     while ((currentLine = reader.readLine()) != null) {
+                        if (currentLine.isEmpty()) {
+                            continue;
+                        }
                         ids.add(currentLine.split("\t")[0].replace("cpd:", ""));
                     }
                 }
@@ -128,13 +131,13 @@ public class OutputGenerator {
         return "<head>\n" +
                 "<style>\n" +
                 "    h3 {\n" +
-                "    padding: 0 0 0 0;\n" +
-                "    margin: 0 0 0 0;\n" +
+                "        padding: 0 0 0 0;\n" +
+                "        margin: 0 0 0 0;\n" +
                 "    }\n" +
                 "\n" +
                 "    ul {\n" +
-                "    padding: 0 0 20 20;\n" +
-                "    margin: 0 0 0 0;\n" +
+                "        padding: 10 0 20 20;\n" +
+                "        margin: 0 0 0 0;\n" +
                 "    }\n" +
                 "\n" +
                 "    body {\n" +
@@ -142,7 +145,7 @@ public class OutputGenerator {
                 "    }\n" +
                 "\n" +
                 "    li {\n" +
-                "        float: left;\n" +
+                "        line-height: 0em;\n" +
                 "    }\n" +
                 "</style>\n" +
                 "</head>\n";
