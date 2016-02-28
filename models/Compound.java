@@ -11,51 +11,68 @@ import java.util.stream.Collectors;
  * Created by Emilio on 2/17/16.
  */
 public class Compound {
-    private static String HEADER_TEMPLATE = "<h3>%s</h3>";
-    private static String LINK_LIST_TEMPLATE = "<ul>\n%s\n</ul>";
+    private static final String HEADER_TEMPLATE = "<h3>%s</h3>";
+    private static final String LIST_TEMPLATE = "<ul>\n%s\n</ul>";
 
     private SimpleStringProperty name;
-    private SimpleListProperty<String> ids;
+    private SimpleStringProperty resultName;
+    private SimpleListProperty<Entry> entries;
 
     public Compound(String name) {
         this.name = new SimpleStringProperty(name);
-        this.ids = null;
+        this.resultName = new SimpleStringProperty();
+        this.entries = new SimpleListProperty<>();
     }
 
     public String getName() {
         return this.name.get();
     }
 
-    public List<String> getids() {
-        return this.ids.get();
+    public String getResultName() { return this.resultName.get(); }
+
+    public void setResultName(String resultName) { this.resultName.set(resultName); }
+
+    public List<Entry> getEntries() {
+        return this.entries.get();
     }
 
-    public void setIds(List<String> ids) {
-        this.ids = new SimpleListProperty<>(FXCollections.observableArrayList(ids));
+    public void setEntries(List<Entry> entries) {
+        this.entries.set(FXCollections.observableList(entries));
     }
 
     public String outputString() {
-        if (this.ids.isEmpty()) {
-            return String.format("%s\n<i>No results found.</i><br><br>\n", this.headerString());
+        if (this.entries.isEmpty()) {
+            return String.format("%s\n<i>Searching compound name returned no results.</i><br><br>\n", this.headerString());
         }
-        return String.format("%s\n%s<br>\n", this.headerString(), this.linkListString());
+        return String.format("%s\n%s<br>\n", this.headerString(), this.entryListString());
     }
 
     private String headerString() {
         return String.format(HEADER_TEMPLATE, this.name.get());
     }
 
-    private String linkListString() {
-        return String.format(LINK_LIST_TEMPLATE ,String.join("\n<br>", this.idLinks()));
+    private String entryListString() {
+        return String.format(LIST_TEMPLATE, String.join("\n<br>", this.entryStrings()));
     }
 
-    private List<String> idLinks() {
-        return this.ids.get().stream()
-                .map(Compound::idLink)
+    private List<String> entryStrings() {
+        return this.entries.get().stream()
+                .map(Entry::entryString)
                 .collect(Collectors.<String>toList());
     }
 
-    private static String idLink(String id) {
-        return String.format("<li><a href=\"http://www.genome.jp/dbget-bin/www_bget?cpd:%s\">%s</a></li>", id, id);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Compound compound = (Compound) o;
+
+        return name.get().equals(compound.name.get());
+    }
+
+    @Override
+    public int hashCode() {
+        return name.get().hashCode();
     }
 }
