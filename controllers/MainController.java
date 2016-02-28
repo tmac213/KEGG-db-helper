@@ -48,7 +48,6 @@ public class MainController implements Initializable {
     }
 
     public void chooseFile(ActionEvent actionEvent) {
-
         Window mainWindow = table.getScene().getWindow();
 
         FileChooser fileChooser = new FileChooser();
