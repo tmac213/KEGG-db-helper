@@ -3,6 +3,7 @@ package keggdbhelper.models;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import keggdbhelper.helpers.OutputGenerator;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,8 +12,6 @@ import java.util.stream.Collectors;
  * Created by Emilio on 2/17/16.
  */
 public class Compound {
-    private static final String HEADER_TEMPLATE = "<h3>%s</h3>";
-    private static final String LIST_TEMPLATE = "<ul>\n%s\n</ul>";
 
     private SimpleStringProperty name;
     private SimpleStringProperty resultName;
@@ -48,11 +47,11 @@ public class Compound {
     }
 
     private String headerString() {
-        return String.format(HEADER_TEMPLATE, this.name.get());
+        return String.format(OutputGenerator.HEADER_TEMPLATE, this.name.get());
     }
 
     private String entryListString() {
-        return String.format(LIST_TEMPLATE, String.join("\n<br>", this.entryStrings()));
+        return String.format(OutputGenerator.LIST_TEMPLATE, String.join("\n<br>", this.entryStrings()));
     }
 
     private List<String> entryStrings() {
