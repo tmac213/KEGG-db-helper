@@ -14,6 +14,8 @@ import java.util.*;
  */
 public class OutputGenerator {
 
+    public static final String HEADER_TEMPLATE = "<h3>%s</h3>";
+    public static final String LIST_TEMPLATE = "<ul>\n%s\n</ul>";
     private static final String FIND_TEMPLATE = "http://rest.kegg.jp/find/compound/%s";
     private static final String GET_TEMPLATE = "http://rest.kegg.jp/get/%s";
     private static final String CSS_STYLE_STRING = "" +
@@ -44,7 +46,7 @@ public class OutputGenerator {
             "</head>\n";
 
 
-    public static boolean generateOutput(Collection<Compound> compounds, String outputFilename) {
+    public static boolean generateOutput(Collection<Compound> compounds, String outputFilename, Options options) {
         if (!retrieve(compounds, RetrievalThread.RetrievalType.ENTRY)) {
             System.err.println("retrieve IDs failed");
         }
@@ -53,43 +55,113 @@ public class OutputGenerator {
             System.err.println("retrieve pathways failed");
         }
 
-        if (!writeToOutput(compounds, outputFilename)) {
-            System.err.println("write to output failed");
-        } else {
-            System.out.println("generate output completed");
-        }
-
-        return true;
-    }
-
-    public static boolean writeToOutput(Collection<Compound> compounds, String outputFilename) {
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(outputFilename, "UTF-8");
-            List<Compound> compoundList = new ArrayList<>(compounds);
-            Collections.sort(compoundList, (o1, o2) -> (o1.getName().compareTo(o2.getName())));
-            writer.println(CSS_STYLE_STRING);
-
-            for (Compound currentCompound : compoundList) {
-                System.out.printf("writing to output for compound %s\n", currentCompound.getName());
-                writer.print(currentCompound.outputString());
+        if (options.shouldMapCompoundsToPathways) {
+            if (!OutputWriter.writeToOutput(compounds, outputFilename, OutputWriter.OutputFormat.CtoP)) {
+                System.err.println("write compounds to output failed");
+                return false;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            try { writer.close(); } catch (Throwable ignore) {}
         }
+
+        if (options.shouldMapPathwaysToCompounds) {
+            if (!OutputWriter.writeToOutput(compounds, outputFilename, OutputWriter.OutputFormat.PtoC)) {
+                System.err.println("write pathways to output failed");
+                return false;
+            }
+        }
+
         return true;
     }
+
+    private static class OutputWriter {
+
+        enum OutputFormat {
+            CtoP,
+            PtoC
+        }
+
+        public static boolean writeToOutput(Collection<Compound> compounds, String outputFilename, OutputFormat format) {
+            switch (format) {
+                case CtoP:
+                    return writeCtoP(compounds, outputFilename);
+                case PtoC:
+                    return writePtoC(compounds, outputFilename);
+                default:
+                    System.err.println("unrecognized output format");
+                    return false;
+            }
+        }
+
+        private static boolean writeCtoP(Collection<Compound> compounds, String outputFilename) {
+            PrintWriter writer = null;
+            try {
+                writer = new PrintWriter(outputFilename + "-compounds.html", "UTF-8");
+                List<Compound> compoundList = new ArrayList<>(compounds);
+                Collections.sort(compoundList, (o1, o2) -> (o1.getName().compareTo(o2.getName())));
+                writer.println(CSS_STYLE_STRING);
+
+                for (Compound currentCompound : compoundList) {
+                    System.out.printf("writing to output for compound %s\n", currentCompound.getName());
+                    writer.print(currentCompound.outputString());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            } finally {
+                try { writer.close(); } catch (Throwable ignore) {}
+            }
+            return true;
+        }
+
+        private static boolean writePtoC(Collection<Compound> compounds, String outputFilename) {
+            PrintWriter writer = null;
+            try {
+                writer = new PrintWriter(outputFilename + "-pathways.html", "UTF-8");
+                Map<Pathway, Set<Compound>> pToCMap = new HashMap<>();
+                for (Compound compound : compounds) {
+                    for (Entry entry : compound.getEntries()) {
+                        for (Pathway pathway : entry.getPathways()) {
+                            if (!pToCMap.containsKey(pathway)) {
+                                Set<Compound> newSet = new HashSet<>();
+                                newSet.add(compound);
+                                pToCMap.put(pathway, newSet);
+                            } else {
+                                pToCMap.get(pathway).add(compound);
+                            }
+                        }
+                    }
+                }
+                writer.println(CSS_STYLE_STRING);
+
+                List<Pathway> orderedList = new ArrayList<>(pToCMap.keySet());
+                Collections.sort(orderedList, ((o1, o2) -> o1.getId().compareTo(o2.getId())));
+
+                for (Pathway currentPathway : orderedList) {
+                    System.out.printf("writing to output for pathway %s\n", currentPathway.getId());
+                    writer.println(currentPathway.headerString());
+                    writer.println("<ul>");
+                    for (Compound compound : pToCMap.get(currentPathway)) {
+                        writer.printf("<li>%s</li>\n", compound.getName());
+                    }
+                    writer.println("</ul>");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            } finally {
+                try { writer.close(); } catch (Throwable ignore) {}
+            }
+            return true;
+        }
+    }
+
+
 
     public static boolean retrieve(Collection<Compound> compounds, RetrievalThread.RetrievalType retrievalType) {
 
         Collection<Thread> retrievalThreads = new LinkedList<>();
 
         for (Compound currentCompound : compounds) {
-            Thread currentThread = null;
-            currentThread = new RetrievalThread(currentCompound, retrievalType);
+            Thread currentThread = new RetrievalThread(currentCompound, retrievalType);
             currentThread.start();
             retrievalThreads.add(currentThread);
         }
@@ -104,6 +176,16 @@ public class OutputGenerator {
         }
 
         return true;
+    }
+
+    public static class Options {
+        boolean shouldMapCompoundsToPathways;
+        boolean shouldMapPathwaysToCompounds;
+
+        public Options(boolean cToP, boolean pToC) {
+            this.shouldMapCompoundsToPathways = cToP;
+            this.shouldMapPathwaysToCompounds = pToC;
+        }
     }
 
     private static class RetrievalThread extends Thread {
