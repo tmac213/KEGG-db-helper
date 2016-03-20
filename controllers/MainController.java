@@ -7,11 +7,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -29,10 +32,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
     public TableView<Compound> table;
+    public CheckBox compoundsToPathways;
+    public CheckBox pathwaysToCompounds;
+    public Circle progressCircle;
 
     /**
      * Called to initialize a controller after its root element has been
@@ -54,12 +63,16 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Select a .xls or .xlsx File");
         File chosenFile = fileChooser.showOpenDialog(mainWindow);
 
-        HashSet<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
-        buildTable(compoundsToSearch);
+        if (chosenFile != null) {
+            progressCircle.setFill(Paint.valueOf("#FF0000"));
+            HashSet<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
+            buildTable(compoundsToSearch);
 
-        new Thread(() -> {
-            OutputGenerator.generateOutput(compoundsToSearch, String.format("%s-output.html", chosenFile.getName()));
-        }).start();
+            new Thread(() -> {
+                OutputGenerator.generateOutput(compoundsToSearch, String.format("%s-output", chosenFile.getName()), new OutputGenerator.Options(compoundsToPathways.isSelected(), pathwaysToCompounds.isSelected()));
+                progressCircle.setFill(Paint.valueOf("#00FF00"));
+            }).start();
+        }
     }
 
     private void buildTable(Collection<Compound> compounds) {
