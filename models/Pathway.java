@@ -22,6 +22,10 @@ public class Pathway {
         return String.format("<li><a href=\"http://www.genome.jp/kegg-bin/show_pathway?%s+%s\">%s</a>: %s</li>", pathway.getId(), entry.getId(), pathway.getId(), pathway.getName());
     }
 
+    public String headerString() {
+        return String.format("<h3><a href=\"http://www.genome.jp/kegg-bin/show_pathway?%s\">%s</a>: %s</h3>\n<br>", id.get(), id.get(), name.get());
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
