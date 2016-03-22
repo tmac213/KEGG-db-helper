@@ -47,11 +47,11 @@ public class OutputGenerator {
 
 
     public static boolean generateOutput(Collection<Compound> compounds, String outputFilename, Options options) {
-        if (!retrieve(compounds, RetrievalThread.RetrievalType.ENTRY)) {
+        if (!retrieve(compounds, RetrievalThread.RetrievalType.ENTRY, options)) {
             System.err.println("retrieve IDs failed");
         }
 
-        if (!retrieve(compounds, RetrievalThread.RetrievalType.PATHWAY)) {
+        if (!retrieve(compounds, RetrievalThread.RetrievalType.PATHWAY, options)) {
             System.err.println("retrieve pathways failed");
         }
 
@@ -156,12 +156,12 @@ public class OutputGenerator {
 
 
 
-    public static boolean retrieve(Collection<Compound> compounds, RetrievalThread.RetrievalType retrievalType) {
+    public static boolean retrieve(Collection<Compound> compounds, RetrievalThread.RetrievalType retrievalType, Options options) {
 
         Collection<Thread> retrievalThreads = new LinkedList<>();
 
         for (Compound currentCompound : compounds) {
-            Thread currentThread = new RetrievalThread(currentCompound, retrievalType);
+            Thread currentThread = new RetrievalThread(currentCompound, retrievalType, options);
             currentThread.start();
             retrievalThreads.add(currentThread);
         }
@@ -179,10 +179,12 @@ public class OutputGenerator {
     }
 
     public static class Options {
+        String organismCode;
         boolean shouldMapCompoundsToPathways;
         boolean shouldMapPathwaysToCompounds;
 
-        public Options(boolean cToP, boolean pToC) {
+        public Options(String organismCode, boolean cToP, boolean pToC) {
+            this.organismCode = organismCode;
             this.shouldMapCompoundsToPathways = cToP;
             this.shouldMapPathwaysToCompounds = pToC;
         }
@@ -197,10 +199,12 @@ public class OutputGenerator {
 
         Compound compound;
         RetrievalType retrievalType;
+        Options options;
 
-        RetrievalThread(Compound compound, RetrievalType retrievalType) {
+        RetrievalThread(Compound compound, RetrievalType retrievalType, Options options) {
             this.compound = compound;
             this.retrievalType = retrievalType;
+            this.options = options;
         }
 
         @Override
@@ -289,7 +293,7 @@ public class OutputGenerator {
             }
         }
 
-        private static void parseDataIntoEntry(Entry entry, BufferedReader reader) throws IOException {
+        private void parseDataIntoEntry(Entry entry, BufferedReader reader) throws IOException {
             reader.readLine();
             StringBuilder entryNameBuilder = new StringBuilder();
             String currentLine;
@@ -305,6 +309,10 @@ public class OutputGenerator {
             while (!(currentLine = reader.readLine()).contains("///")) {
                 if (currentLine.isEmpty() || !currentLine.matches(".*\\bmap\\d{5}\\b.*")) {
                     continue;
+                }
+
+                if (!options.organismCode.isEmpty()) {
+                    currentLine = currentLine.replaceAll("map", options.organismCode);
                 }
 
                 pathways.add(parseLineIntoPathway(currentLine));
