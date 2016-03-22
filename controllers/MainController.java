@@ -7,10 +7,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Paint;
@@ -38,10 +35,11 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
-    public TableView<Compound> table;
-    public CheckBox compoundsToPathways;
-    public CheckBox pathwaysToCompounds;
+    public TableView<Compound> tableView;
+    public CheckBox listByCompoundCheckBox;
+    public CheckBox listByPathwayCheckBox;
     public Circle progressCircle;
+    public TextField organismTextField;
 
     /**
      * Called to initialize a controller after its root element has been
@@ -57,27 +55,28 @@ public class MainController implements Initializable {
     }
 
     public void chooseFile(ActionEvent actionEvent) {
-        Window mainWindow = table.getScene().getWindow();
+        Window mainWindow = tableView.getScene().getWindow();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a .xls or .xlsx File");
         File chosenFile = fileChooser.showOpenDialog(mainWindow);
 
         if (chosenFile != null) {
-            progressCircle.setFill(Paint.valueOf("#FF0000"));
+            progressCircle.setFill(Paint.valueOf("#FF0000"));  // red
             HashSet<Compound> compoundsToSearch = extractCompoundsFromFile(chosenFile);
             buildTable(compoundsToSearch);
 
             new Thread(() -> {
-                OutputGenerator.generateOutput(compoundsToSearch, String.format("%s-output", chosenFile.getName()), new OutputGenerator.Options(compoundsToPathways.isSelected(), pathwaysToCompounds.isSelected()));
-                progressCircle.setFill(Paint.valueOf("#00FF00"));
+                OutputGenerator.Options options = new OutputGenerator.Options(organismTextField.getText(), listByCompoundCheckBox.isSelected(), listByPathwayCheckBox.isSelected());
+                OutputGenerator.generateOutput(compoundsToSearch, String.format("%s-output", chosenFile.getName()), options);
+                progressCircle.setFill(Paint.valueOf("#00FF00"));  // green
             }).start();
         }
     }
 
     private void buildTable(Collection<Compound> compounds) {
-        table.setEditable(true);
-        table.getColumns().clear();
+        tableView.setEditable(true);
+        tableView.getColumns().clear();
         ObservableList<Compound> tableData = FXCollections.observableArrayList(compounds);
 
         Callback<TableColumn, TableCell> cellFactory =
@@ -93,7 +92,7 @@ public class MainController implements Initializable {
                             }
 
                             private String getString() {
-                                return getItem() == null ? "" : getItem().toString();
+                                return getItem() == null ? "" : getItem();
                             }
                         };
 
@@ -129,10 +128,10 @@ public class MainController implements Initializable {
         compoundNameColumn.setCellValueFactory(new PropertyValueFactory<Compound, String>("name"));
         compoundNameColumn.setCellFactory(cellFactory);
 
-        table.setItems(tableData);
-        table.getColumns().add(compoundNameColumn);
+        tableView.setItems(tableData);
+        tableView.getColumns().add(compoundNameColumn);
 
-        table.setEditable(false);
+        tableView.setEditable(false);
     }
 
     private HashSet<Compound> extractCompoundsFromFile(File xlsFile) {
