@@ -29,10 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController implements Initializable {
     public TableView<Compound> tableView;
@@ -68,7 +65,7 @@ public class MainController implements Initializable {
 
             new Thread(() -> {
                 OutputGenerator.Options options = new OutputGenerator.Options(organismTextField.getText(), listByCompoundCheckBox.isSelected(), listByPathwayCheckBox.isSelected());
-                OutputGenerator.generateOutput(compoundsToSearch, String.format("%s-output", chosenFile.getName()), options);
+                OutputGenerator.generateOutput(compoundsToSearch, String.format("%s-%s-output-%s", chosenFile.getName(), new Date().toString().replace(' ', '-'), options.getOrganismCode()), options);
                 progressCircle.setFill(Paint.valueOf("#00FF00"));  // green
             }).start();
         }
