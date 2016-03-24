@@ -188,6 +188,10 @@ public class OutputGenerator {
             this.shouldMapCompoundsToPathways = cToP;
             this.shouldMapPathwaysToCompounds = pToC;
         }
+
+        public String getOrganismCode() {
+            return this.organismCode;
+        }
     }
 
     private static class RetrievalThread extends Thread {
