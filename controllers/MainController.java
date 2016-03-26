@@ -30,8 +30,25 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class MainController implements Initializable {
+
+    private static final Logger log= Logger.getLogger( MainController.class.getName() );
+    static {
+        try {
+            FileHandler fileHandler = new FileHandler(System.getProperty("user.dir") + "/MainController.log");
+            log.addHandler(fileHandler);
+            fileHandler.setFormatter(new SimpleFormatter());
+            log.setLevel(Level.ALL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public TableView<Compound> tableView;
     public CheckBox listByCompoundCheckBox;
     public CheckBox listByPathwayCheckBox;
@@ -96,7 +113,7 @@ public class MainController implements Initializable {
                         cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
                             @Override
                             public void handle(MouseEvent event) {
-                                System.out.println(event.getSource().toString() + " clicked.");
+                                log.log(Level.FINE, event.getSource().toString() + " clicked.");
 
                                 try {
                                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/CompoundView.fxml"));
@@ -110,7 +127,7 @@ public class MainController implements Initializable {
                                     stage.show();
 
                                 } catch (IOException e) {
-                                    e.printStackTrace();
+                                    log.log(Level.SEVERE, e.getMessage());
                                 }
 
                                 // get results for compound
@@ -133,14 +150,14 @@ public class MainController implements Initializable {
 
     private HashSet<Compound> extractCompoundsFromFile(File xlsFile) {
         if (xlsFile == null) {
-            System.out.println("File was null");
+            log.log(Level.WARNING, "File was null");
             return null;
         }
 
         Iterator<Row> rowIterator = getRowIteratorForFile(xlsFile);
 
         if (rowIterator == null) {
-            System.err.println("MainController: getRowIteratorForFile returned null.");
+            log.log(Level.WARNING, "MainController: getRowIteratorForFile returned null.");
             return null;
         }
 
@@ -187,10 +204,10 @@ public class MainController implements Initializable {
             Workbook workbook = new XSSFWorkbook(inputStream);
             return workbook.getSheetAt(0).rowIterator();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage());
             return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage());
             return null;
         }
     }
