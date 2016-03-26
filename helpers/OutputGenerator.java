@@ -8,12 +8,27 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by Emilio on 2/19/16.
  */
 public class OutputGenerator {
 
+    private static final Logger log= Logger.getLogger( OutputGenerator.class.getName() );
+    static {
+        try {
+            FileHandler fileHandler = new FileHandler(System.getProperty("user.dir") + "/OutputGenerator.log");
+            log.addHandler(fileHandler);
+            fileHandler.setFormatter(new SimpleFormatter());
+            log.setLevel(Level.ALL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public static final String HEADER_TEMPLATE = "<h3>%s</h3>";
     public static final String LIST_TEMPLATE = "<ul>\n%s\n</ul>";
     private static final String FIND_TEMPLATE = "http://rest.kegg.jp/find/compound/%s";
@@ -48,23 +63,23 @@ public class OutputGenerator {
 
     public static boolean generateOutput(Collection<Compound> compounds, String outputFilename, Options options) {
         if (!retrieve(compounds, RetrievalThread.RetrievalType.ENTRY, options)) {
-            System.err.println("retrieve IDs failed");
+            log.log(Level.SEVERE, "retrieve IDs failed");
         }
 
         if (!retrieve(compounds, RetrievalThread.RetrievalType.PATHWAY, options)) {
-            System.err.println("retrieve pathways failed");
+            log.log(Level.SEVERE, "retrieve pathways failed");
         }
 
         if (options.shouldMapCompoundsToPathways) {
             if (!OutputWriter.writeToOutput(compounds, outputFilename, OutputWriter.OutputFormat.CtoP)) {
-                System.err.println("write compounds to output failed");
+                log.log(Level.SEVERE, "write compounds to output failed");
                 return false;
             }
         }
 
         if (options.shouldMapPathwaysToCompounds) {
             if (!OutputWriter.writeToOutput(compounds, outputFilename, OutputWriter.OutputFormat.PtoC)) {
-                System.err.println("write pathways to output failed");
+                log.log(Level.SEVERE, "write pathways to output failed");
                 return false;
             }
         }
@@ -86,7 +101,7 @@ public class OutputGenerator {
                 case PtoC:
                     return writePtoC(compounds, outputFilename);
                 default:
-                    System.err.println("unrecognized output format");
+                    log.log(Level.SEVERE, "unrecognized output format");
                     return false;
             }
         }
@@ -100,11 +115,11 @@ public class OutputGenerator {
                 writer.println(CSS_STYLE_STRING);
 
                 for (Compound currentCompound : compoundList) {
-                    System.out.printf("writing to output for compound %s\n", currentCompound.getName());
+                    log.log(Level.FINE, String.format("writing to output for compound %s\n", currentCompound.getName()));
                     writer.print(currentCompound.outputString());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.log(Level.SEVERE, e.getMessage());
                 return false;
             } finally {
                 try { writer.close(); } catch (Throwable ignore) {}
@@ -136,7 +151,7 @@ public class OutputGenerator {
                 Collections.sort(orderedList, ((o1, o2) -> o1.getId().compareTo(o2.getId())));
 
                 for (Pathway currentPathway : orderedList) {
-                    System.out.printf("writing to output for pathway %s\n", currentPathway.getId());
+                    log.log(Level.FINE, String.format("writing to output for pathway %s\n", currentPathway.getId()));
                     writer.println(currentPathway.headerString());
                     writer.println("<ul>");
                     for (Compound compound : pToCMap.get(currentPathway)) {
@@ -170,7 +185,7 @@ public class OutputGenerator {
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.log(Level.WARNING, e.getMessage());
                 return false;
             }
         }
@@ -221,12 +236,12 @@ public class OutputGenerator {
                     runPathwayRetrieval();
                     break;
                 default:
-                    System.err.println("unknown retrieval type");
+                    log.log(Level.SEVERE, "unknown retrieval type");
             }
         }
 
         private void runEntryRetrieval() {
-            System.out.printf("retrieving IDs for compound %s\n", compound.getName());
+            log.log(Level.FINE, String.format("retrieving IDs for compound %s\n", compound.getName()));
             String currentLine;
             List<Entry> entries = new LinkedList<>();
             String urlString = String.format(FIND_TEMPLATE, compound.getName());
@@ -243,7 +258,7 @@ public class OutputGenerator {
                     entries.add(new Entry(currentLine.split("\t")[0].replace("cpd:", "")));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.log(Level.SEVERE, e.getMessage());
             } finally {
                 try { input.close(); } catch (Throwable ignore) {}
             }
@@ -251,7 +266,7 @@ public class OutputGenerator {
         }
 
         private void runPathwayRetrieval() {
-            System.out.printf("retrieving pathways for compound %s\n", compound.getName());
+            log.log(Level.FINE, String.format("retrieving pathways for compound %s\n", compound.getName()));
             if (compound.getEntries().isEmpty()) {
                 return;
             }
